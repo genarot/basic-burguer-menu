@@ -1,20 +1,20 @@
 import React,{Component} from 'react';
 import Order from '../../components/Order/Order';
 import axios from '../../axios-orders'
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 export default class Orders extends Component {
 
     state = {
-        orders: [],
+        orders: {},
         loading: true
     }
 
     componentDidMount() {
         axios.get('/orders.json')
         .then((result) => {
-            console.log(result.data);
-            
-            // this.setState({ orders: result.data})
+
+            this.setState({ orders: result.data, loading:false})
         }).catch((err) => {
             this.setState({loading: false})
         });
@@ -22,16 +22,14 @@ export default class Orders extends Component {
 
     render() {
         return (
-            <div className="class-name">
-                <Order />
-                <Order />
-                <Order />
-                <Order />
-                <Order />
-                <Order />
-                <Order />
-                <Order />
-                <Order />
+            <div>
+                {
+                    this.state.loading ?
+                    <Spinner />
+                    :
+                    Object.keys(this.state.orders).map( key => <Order key={key} ingredients={this.state.orders[key].ingredients} price={this.state.orders[key].price}/>)
+                }
+                
             </div>
         );
     }
