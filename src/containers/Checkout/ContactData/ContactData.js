@@ -6,6 +6,9 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import { throws } from 'assert';
 import Input from '../../../components/UI/Input/Input';
 
+//Redux
+import {connect} from 'react-redux';
+
 class ContactData extends Component {
     state = {
         orderForm: {
@@ -137,14 +140,16 @@ class ContactData extends Component {
     orderHandler = (e) => {
         e.preventDefault();
 
-        this.setState({loading: true})
+        this.setState({ 
+                        loading: true
+                    })
         const formData = {};
         for ( let formElementIdentifier in this.state.orderForm ) {
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
         }
         const order = {
             ingredients: this.props.ingredients,
-            price: this.props.price,
+            price:  this.props.price,
             orderData: formData
         }
 
@@ -202,4 +207,11 @@ class ContactData extends Component {
     }
 }
 
-export default ContactData;
+
+function mapStateToProps(state) {
+    return {
+        ingredients: state.ingredients,
+        price: state.totalPrice
+    }
+}
+export default connect(mapStateToProps)(ContactData);
