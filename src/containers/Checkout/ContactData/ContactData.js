@@ -3,11 +3,11 @@ import Button from '../../../components/UI/Button/Button'
 import classes from './ContactData.css'
 import axios from '../../../axios-orders';
 import Spinner from '../../../components/UI/Spinner/Spinner';
-import { throws } from 'assert';
 import Input from '../../../components/UI/Input/Input';
-
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
 //Redux
 import {connect} from 'react-redux';
+import { purchaseBurguer } from '../../../store/actions/order';
 
 class ContactData extends Component {
     state = {
@@ -92,8 +92,7 @@ class ContactData extends Component {
                 valid:true
             } 
         },
-        formIsValid: false,
-        loading: false
+        formIsValid: false
     }
 
     checkValidity( value, rules ) {
@@ -136,13 +135,11 @@ class ContactData extends Component {
             orderForm: updatedOrderForm,
             formIsValid:formIsValid
         })
+
     }
     orderHandler = (e) => {
         e.preventDefault();
-
-        this.setState({ 
-                        loading: true
-                    })
+        
         const formData = {};
         for ( let formElementIdentifier in this.state.orderForm ) {
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
@@ -152,21 +149,8 @@ class ContactData extends Component {
             price:  this.props.price,
             orderData: formData
         }
-
-        axios.post('/orders.json', order)
-        .then((result) => {
-            console.log(result);
-            // setTimeout(() => {
-                this.setState({loading: false, purchasing: false})
-                this.props.history.push('/');
-            // }, 500);
-        }).catch((err) => {
-            console.error(err);
-            
-            // setTimeout(() => {
-                this.setState({loading: false, purchasing: false})
-            // }, 1000);
-        });
+        
+        this.props.onOrderBurguer(order)
     }
 
     render() {
@@ -174,7 +158,7 @@ class ContactData extends Component {
             <div className={classes.ContactData}>
                 <h4>Enter your Contact Data</h4>
                 {
-                    this.state.loading ?
+                    this.props.loading ?
                         <Spinner />
                     :
                         <form onSubmit={this.orderHandler}>
@@ -196,9 +180,6 @@ class ContactData extends Component {
                                     )
                                 })
                             }
-                            {/* <Input onChange={this.handleChange} inputtype="input" type="text"  name="email" placeholder="Your Email"/>
-                            <Input onChange={this.handleChange} inputtype="input" type="text"  name="street" placeholder="Your Street"/>
-                            <Input onChange={this.handleChange} inputtype="input" type="text"  name="postalCode" placeholder="Postal Code"/> */}
                             <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
                         </form>
                 }
@@ -210,8 +191,14 @@ class ContactData extends Component {
 
 function mapStateToProps(state) {
     return {
-        ingredients: state.ingredients,
-        price: state.totalPrice
-    }
+        ingredients: state.burguerBuilder.ingredients,
+        price: state.burguerBuilder.totalPrice,
+        loading: state.order.loading
+    } 
 }
-export default connect(mapStateToProps)(ContactData);
+
+const mapDispatchToProps = (dispatch) => ({
+    onOrderBurguer: (orderData) => dispatch(purchaseBurguer(orderData))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps) (withErrorHandler(ContactData, axios));

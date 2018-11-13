@@ -11,7 +11,8 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 //Redux
 import { connect } from 'react-redux'
-import { ADD_INGREDIENT, REMOVE_INGREDIENT } from '../../store/actions';
+import { addIngredient, removeIngredient, purchaseInit } from '../../store/actions';
+import { initIngredients } from '../../store/actions/burguerBuilder';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -30,21 +31,12 @@ class BurgerBuilder extends Component {
         // totalPrice: 4,
         purchasable: false,
         purchasing: false,
-        loading: false,
-        error: false
+        loading: false
     }
 
     componentDidMount() {
         console.log(this.props);
-        
-        // axios.get('/ingredientes.json')
-        // .then((result) => {
-        //     console.log(result);
-        //     this.setState({ ingredients: result.data })
-        // }).catch((err) => {
-        //     console.log(err);
-        //     this.setState({error: true})
-        // });
+        this.props.onInitIngredients();
     }
 
     updatePurchaseState (ingredients) {
@@ -86,6 +78,7 @@ class BurgerBuilder extends Component {
         // queryParams.push('price=' + this.props.totalPrice );
 
         // const queryString   = queryParams.join('&');
+        this.props.onInitPurchase();
         this.props.history.push({
             pathname: '/checkout'
             // search: '?'+queryString
@@ -130,7 +123,7 @@ class BurgerBuilder extends Component {
                             price={this.props.totalPrice} />
                     </Aux>
                     :
-                    ( !this.state.error ? <Spinner /> : <p>Ingredients can't be loaded!</p>)
+                    ( !this.props.error ? <Spinner /> : <p>Ingredients can't be loaded!</p>)
                 }
             </Aux>
         );
@@ -141,16 +134,18 @@ function mapStateToProps(state) {
     console.log('mapStateToProps',state);
     
     return{
-        ings: state.ingredients,
-        totalPrice: state.totalPrice
+        ings: state.burguerBuilder.ingredients,
+        totalPrice: state.burguerBuilder.totalPrice,
+        error: state.burguerBuilder.error
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        onIngredientAdded: (ingName) => dispatch({type: ADD_INGREDIENT, ingredientName: ingName}),
-        onIngredientRemoved: (ingName) => dispatch({type: REMOVE_INGREDIENT, ingredientName: ingName})
+        onIngredientAdded: (ingName) => dispatch(addIngredient(ingName)),
+        onIngredientRemoved: (ingName) => dispatch(removeIngredient(ingName)),
+        onInitIngredients: () => dispatch(initIngredients()),
+        onInitPurchase: () => dispatch(purchaseInit())
     }
 }
-
 export default  connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, axios));
