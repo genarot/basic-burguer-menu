@@ -81,7 +81,7 @@ class Auth extends Component {
                 touched: true
             }
         };
-        console.log(e.target.value);
+        // console.log(e.target.value);
         
         this.setState({
             controls: updatedControls

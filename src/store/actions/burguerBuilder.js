@@ -1,5 +1,5 @@
 import * as actionTypes from './actionTypes';
-import axios from '../../axios-orders'
+import axios from 'axios'
 
 export const addIngredient = ( name ) => {
     return {
@@ -28,7 +28,7 @@ export const fetchIngredientsFailed = () => {
 }
 
 export const initIngredients = () => async (dispatch, getState) => {
-    await axios.get('/ingredientes.json')
+    await axios.get('https://react-my-burguer-7b7a2.firebaseio.com/ingredientes.json')
     .then((result) => {
         console.log(result);
         dispatch(setIngredients(result.data))

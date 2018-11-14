@@ -5,10 +5,12 @@ import thunk from 'redux-thunk';
 //Reducers
 import burguerBuilderReducer from './reducers/burguerBuilder'
 import orderReducer from './reducers/order';
+import authReducer from './reducers/auth';
 
 const rootReducer = combineReducers({
+    burguerBuilder: burguerBuilderReducer,
     order: orderReducer,
-    burguerBuilder: burguerBuilderReducer
+    auth: authReducer
 });
 
 // Middlewares
@@ -27,8 +29,9 @@ const logger = (store) => {
 const store = createStore(
                         rootReducer, 
                         compose(
-                            applyMiddleware(thunk, logger),
-                            window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+                            applyMiddleware(thunk, logger)
+                            // ,
+                            // window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
                         ));
 
 export default store;
